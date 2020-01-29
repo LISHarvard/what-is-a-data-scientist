@@ -1,10 +1,46 @@
 library(MASS)
 library(nnet)
+library(car)
 
 # read in data
 df = read.csv("/Users/hayleeham/Documents/what-is-a-data-scientist/data/compensation_data.csv")
 df_usa = read.csv("/Users/hayleeham/Documents/what-is-a-data-scientist/data/compensation_data_usa.csv")
 df10 = read.csv("/Users/hayleeham/Documents/what-is-a-data-scientist/data/compensation_data_10.csv")
+
+linear_hypo <- function(model){
+  jobs = c("data_sci", "software_eng", "data_ana", "r_sci", "r_ast", "consultant", "data_eng", "bus_ana", "manager")
+  
+  for (i1 in 1:length(jobs)){
+    job1 = jobs[i1]
+    print(c("JOB 1", job1))
+    significant = c()
+    not_significant = c()
+    si = 1
+    nsi = 1
+    for (i2 in 1:length(jobs)){
+      if (i2 > i1){
+        job2 = jobs[i2]
+        p <- linearHypothesis(model,c(paste(job1," = ", job2)))
+        if (p$"Pr(>F)"[2] < 0.05){
+          significant[si] = job2
+          si = si + 1
+        }
+        else{
+          not_significant[nsi] = job2
+          nsi = nsi + 1
+        }
+      }
+    }
+    if (length(significant) > 0){
+      print("Significant")
+      print(significant)
+    }
+    if (length(not_significant) > 0){
+      print("Not Significant")
+      print(not_significant)
+    }
+  }
+}
 
 # try running the model as a simple OLS using the averages from the salary buckets
 # restrict to US
